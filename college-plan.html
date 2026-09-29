@@ -92,6 +92,32 @@ summary::-webkit-details-marker{display:none;}
 .dl .pl{font-size:14px;color:var(--muted);}
 .dl input[type="text"]{width:100%;min-height:44px;margin-top:4px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:9px;padding:0 12px;font:15px "Figtree",sans-serif;}
 .reset{margin-top:22px;min-height:44px;padding:0 16px;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:10px;font:600 14px "Figtree",sans-serif;cursor:pointer;}
+.nextcard{border-color:var(--accent);}
+.nx{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line);align-items:baseline;}
+.nx:first-of-type{border-top:0;}
+.nx .what{font-size:15px;}
+.nx .what b{font-weight:600;}
+.nx .due{font-size:13px;font-weight:600;color:var(--muted);text-align:right;white-space:nowrap;}
+.nx .due.late{color:var(--warn);}
+details.sch{background:var(--surface);border:1px solid var(--line);border-radius:14px;margin-bottom:10px;overflow:hidden;}
+details.sch[open]{border-color:var(--accent);}
+.sch .body{padding:0 16px 16px;}
+.sch .st{font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap;}
+.sch .st.full{color:var(--done);}
+.dates{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:0 0 12px;}
+.dates input{min-width:0;}
+.dates label,.fld{display:block;font-size:12.5px;color:var(--muted);font-weight:600;}
+.sch input[type="date"],.sch input[type="number"],.sch select,.sch textarea{width:100%;margin-top:3px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:9px;padding:8px 10px;font:15px "Figtree",sans-serif;min-height:44px;}
+.sch textarea{display:block;resize:vertical;line-height:1.4;}
+.pr{border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px;}
+.pr .r2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0;}
+.wc{font-size:13px;color:var(--muted);margin-top:4px;}
+.wc.over{color:var(--warn);font-weight:600;}
+.sbtn{min-height:44px;padding:0 14px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:10px;font:600 14px "Figtree",sans-serif;cursor:pointer;margin-top:10px;margin-right:8px;}
+.sbtn.pri{background:var(--accent);border-color:var(--accent);color:var(--surface);}
+.sbtn.del{color:var(--muted);margin-top:8px;}
+.none{display:flex;gap:10px;align-items:center;font-size:14.5px;margin-top:12px;cursor:pointer;}
+.none input{width:22px;height:22px;}
 [hidden]{display:none !important;}
 @media (prefers-reduced-motion: reduce){.bar>i{transition:none;}}
 </style>
@@ -122,8 +148,8 @@ summary::-webkit-details-marker{display:none;}
 
 <script>
 var KEY = "collegeplan.v1";
-var state = { checks: {}, dates: {} };
-try { var saved = JSON.parse(localStorage.getItem(KEY) || "null"); if (saved && saved.checks) state = saved; if (!state.dates) state.dates = {}; } catch (e) {}
+var state = { checks: {}, dates: {}, supp: {} };
+try { var saved = JSON.parse(localStorage.getItem(KEY) || "null"); if (saved && saved.checks) state = saved; if (!state.dates) state.dates = {}; if (!state.supp) state.supp = {}; } catch (e) {}
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
 
 var TAGNAME = { CA: "Common App", SITE: "School site", OTHER: "Other" };
@@ -260,7 +286,22 @@ var DEADLINES = [
  ["Lehigh University","Regular Decision","About Jan 15",false]
 ];
 
-var STEPS = [["prompts","Prompts pulled"],["draft","Draft"],["coach","Coach reviewed"],["final","Final"]];
+/* default supplement dates: [paste prompts by, first draft by, final by] */
+var SUPPDATES = {
+ "northwestern-university":["2026-10-04","2026-10-16","2026-10-28"],
+ "georgia-institute-of-technology":["2026-10-04","2026-10-09","2026-10-13"],
+ "purdue-university":["2026-10-04","2026-10-23","2026-10-30"],
+ "virginia-tech":["2026-10-04","2026-11-06","2026-11-12"],
+ "university-of-minnesota-twin-cities":["2026-10-04","2026-10-23","2026-10-30"],
+ "university-of-florida":["2026-10-04","2026-10-23","2026-10-30"],
+ "university-of-central-florida":["2026-10-04","2026-10-23","2026-10-30"],
+ "university-of-south-florida":["2026-10-04","2026-10-23","2026-10-30"],
+ "tufts-university":["2026-10-04","2026-11-20","2026-12-11"],
+ "carnegie-mellon-university":["2026-10-04","2026-11-20","2026-12-11"],
+ "bucknell-university":["2026-10-04","2026-12-04","2026-12-11"],
+ "lehigh-university":["2026-10-04","2026-12-04","2026-12-11"]
+};
+var STAT = [["todo","Not started"],["draft","Drafted"],["coach","Coach reviewed"],["final","Final"]];
 
 function slug(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""); }
 function d(str){ var p = str.split("-"); return new Date(+p[0], +p[1]-1, +p[2]); }
@@ -293,24 +334,100 @@ function renderWeekly(){
   document.getElementById("weekly").innerHTML = h;
 }
 
+function esc(t){ return String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function words(t){ var m = (t||"").trim().match(/\S+/g); return m ? m.length : 0; }
+function sState(id){ if (!state.supp[id]) state.supp[id] = { none:false, dates:{}, prompts:[] }; return state.supp[id]; }
+function sDate(id,k){ return sState(id).dates[k] || SUPPDATES[id][k]; }
+function iso(dt){ return dt.getFullYear()+"-"+("0"+(dt.getMonth()+1)).slice(-2)+"-"+("0"+dt.getDate()).slice(-2); }
+function dueLabel(str){
+  var t = new Date(); t.setHours(0,0,0,0);
+  var n = Math.round((d(str)-t)/86400000);
+  var when = d(str).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});
+  if (n < 0) return {late:true, txt:"Overdue " + (-n) + (n===-1?" day":" days") + " (" + when + ")"};
+  if (n === 0) return {late:false, txt:"Today"};
+  if (n === 1) return {late:false, txt:"Tomorrow (" + when + ")"};
+  return {late:false, txt:"By " + when + ", in " + n + " days"};
+}
+function nextAction(id){
+  var s = sState(id);
+  if (s.none) return null;
+  if (!s.prompts.length) return { act:"Paste in every prompt from the Common App and the school's site", due:sDate(id,0) };
+  var c = { todo:0, draft:0, coach:0 };
+  s.prompts.forEach(function(p){ if (c[p.s] != null) c[p.s]++; });
+  function pl(n){ return n + (n===1 ? " prompt" : " prompts"); }
+  if (c.todo) return { act:"Write a first draft of " + pl(c.todo), due:sDate(id,1) };
+  if (c.draft) return { act:"Send " + pl(c.draft) + " to your coach, then revise", due:sDate(id,2) };
+  if (c.coach) return { act:"Finalize " + pl(c.coach) + ": read it out loud and check the word limit", due:sDate(id,2) };
+  return null;
+}
+function schoolStatus(id){
+  var s = sState(id);
+  if (s.none) return { txt:"No supplement", full:true };
+  if (!s.prompts.length) return { txt:"No prompts yet", full:false };
+  var f = s.prompts.filter(function(p){ return p.s === "final"; }).length;
+  return { txt:f + "/" + s.prompts.length + " final", full:f === s.prompts.length };
+}
+function renderNext(){
+  var items = [];
+  SCHOOLS.forEach(function(sc){ var id = slug(sc[0]), a = nextAction(id); if (a) items.push({ name:sc[0], act:a.act, due:a.due }); });
+  items.sort(function(a,b){ return a.due < b.due ? -1 : a.due > b.due ? 1 : 0; });
+  var h = '<h3>Do next</h3>';
+  if (!items.length) h += '<p>Nothing left. Every supplement is final.</p>';
+  else {
+    h += '<p class="note" style="margin-bottom:4px">The closest deadlines first. Each item disappears when you update the status below.</p>';
+    items.slice(0,5).forEach(function(it){
+      var dl = dueLabel(it.due);
+      h += '<div class="nx"><div class="what"><b>'+esc(it.name)+'</b><br>'+esc(it.act)+'</div><div class="due'+(dl.late?' late':'')+'">'+dl.txt+'</div></div>';
+    });
+    if (items.length > 5) h += '<p class="note" style="margin:8px 0 0">and '+(items.length-5)+' more below</p>';
+  }
+  document.getElementById("nextcard").innerHTML = h;
+}
+function wcHTML(p){
+  var n = words(p.d), lim = +p.w;
+  return lim ? n+" / "+lim+" words" + (n>lim ? " (over by "+(n-lim)+")" : "") : n+" words";
+}
+function promptHTML(id, p, i){
+  var opts = STAT.map(function(x){ return '<option value="'+x[0]+'"'+(p.s===x[0]?' selected':'')+'>'+x[1]+'</option>'; }).join("");
+  var over = +p.w && words(p.d) > +p.w;
+  return '<div class="pr">' +
+    '<label class="fld">Prompt '+(i+1)+'<textarea rows="3" data-sid="'+id+'" data-pi="'+i+'" data-f="t" placeholder="Paste the prompt here">'+esc(p.t)+'</textarea></label>' +
+    '<div class="r2"><label class="fld">Word limit<input type="number" inputmode="numeric" min="0" data-sid="'+id+'" data-pi="'+i+'" data-f="w" value="'+esc(p.w)+'" placeholder="e.g. 250"></label>' +
+    '<label class="fld">Status<select data-sid="'+id+'" data-pi="'+i+'" data-f="s">'+opts+'</select></label></div>' +
+    '<label class="fld">Draft<textarea rows="6" data-sid="'+id+'" data-pi="'+i+'" data-f="d" placeholder="Write or paste your draft here">'+esc(p.d)+'</textarea></label>' +
+    '<div class="wc'+(over?' over':'')+'" data-wc="'+id+'-'+i+'">'+wcHTML(p)+'</div>' +
+    '<button class="sbtn del" data-act="delprompt" data-sid="'+id+'" data-pi="'+i+'">Remove this prompt</button></div>';
+}
 function renderSupp(){
-  var h = '';
-  h += '<div class="card"><h3>How to get through 12 sets of supplements</h3><ol>' +
-    '<li>Group prompts into types: why this school, why this major, a community or activity story, and a creative or short-answer one.</li>' +
+  var openIds = {};
+  document.querySelectorAll("details.sch[open]").forEach(function(e){ openIds[e.getAttribute("data-sid")] = true; });
+  var h = '<div class="card nextcard" id="nextcard"></div>';
+  h += '<p class="note">Open a school, paste its prompts (Common App Writing Supplement tab and the school\'s site), then set each prompt\'s status as you go. Dates are suggestions that fit your weekly plan. Change them if you need to.</p>';
+  SCHOOLS.forEach(function(sc){
+    var id = slug(sc[0]), s = sState(id), st = schoolStatus(id);
+    var prompts = s.prompts.map(function(p,i){ return promptHTML(id,p,i); }).join("");
+    h += '<details class="sch" data-sid="'+id+'"'+(openIds[id]?' open':'')+'><summary><div><div class="wk-t">'+esc(sc[0])+'</div>' +
+      '<div class="wk-d">'+esc(sc[1])+'. Draft by '+fmt(d(sDate(id,1)))+', final by '+fmt(d(sDate(id,2)))+'</div></div><div class="st'+(st.full?' full':'')+'">'+st.txt+'</div></summary><div class="body">' +
+      '<div class="dates"><label>Prompts in by<input type="date" data-sid="'+id+'" data-dk="0" value="'+sDate(id,0)+'"></label>' +
+      '<label>First draft by<input type="date" data-sid="'+id+'" data-dk="1" value="'+sDate(id,1)+'"></label>' +
+      '<label>Final by<input type="date" data-sid="'+id+'" data-dk="2" value="'+sDate(id,2)+'"></label></div>' +
+      (s.none ? '' : prompts +
+        '<button class="sbtn pri" data-act="addprompt" data-sid="'+id+'">Add a prompt</button>' +
+        '<details style="margin-top:10px"><summary style="padding:8px 0;min-height:44px" class="fld">Paste several prompts at once</summary>' +
+        '<textarea rows="5" data-bulk="'+id+'" placeholder="One prompt per line"></textarea>' +
+        '<button class="sbtn" data-act="bulk" data-sid="'+id+'">Add these prompts</button></details>') +
+      '<label class="none"><input type="checkbox" data-none="'+id+'"'+(s.none?' checked':'')+'>This school has no supplement</label>' +
+      '</div></details>';
+  });
+  h += '<details class="sch" style="margin-top:14px"><summary><div class="wk-t">How to get through all the supplements</div></summary><div class="body">' +
+    '<ol style="padding-left:20px"><li>Group prompts into types: why this school, why this major, a community or activity story, and a creative or short-answer one.</li>' +
     '<li>Write one strong draft per type. Then tailor it for each school with specifics you can only say about that school.</li>' +
     '<li>Do Northwestern first, then Georgia Tech, then the rest in deadline order.</li>' +
     '<li>Send each draft to your coach before you revise it. Aim for two rounds.</li>' +
-    '<li>Read it out loud, check the word limit, and paste it into the Common App last.</li></ol></div>';
-  h += '<div class="card"><h3>Pick stories your personal essay did not use</h3>' +
-    '<p>Your personal statement already covers your Roblox to Blender to 3D printing path, the RC car redesign, the Infusion Center art piece, and the Congressional Art Competition. Supplements read better when they show other sides of you. Ideas to draw from:</p>' +
-    '<ul><li>Starting the photography club and growing it to about 70 members</li><li>Teaching math and reading at Kumon</li><li>Your train and locomotive projects</li><li>Your AP 2-D Art portfolio and how your ideas jump between subjects</li></ul></div>';
-  h += '<p class="note">Prompts change every year. Use the Writing Supplement tab in the Common App for the official ones, and check each school\'s site for anything that is not in the Common App.</p>';
-  SCHOOLS.forEach(function(s){
-    var id = slug(s[0]);
-    var steps = STEPS.map(function(st){ return taskHTML("s-"+id+"-"+st[0], "", st[1], false); }).join("");
-    h += '<div class="card school"><div class="top"><h3>'+s[0]+'</h3></div><div class="plan">'+s[1]+'</div><div class="steps">'+steps+'</div></div>';
-  });
+    '<li>Read it out loud, check the word limit, and paste it into the Common App last.</li></ol>' +
+    '<p><b>Pick stories your personal essay did not use.</b> It already covers Roblox to Blender to 3D printing, the RC car redesign, the Infusion Center art piece, and the Congressional Art Competition. Other ideas: starting the photography club and growing it to about 70 members, teaching at Kumon, your train and locomotive projects, and your AP 2-D Art portfolio.</p></div></details>';
   document.getElementById("supp").innerHTML = h;
+  renderNext();
 }
 
 function renderDates(){
@@ -362,6 +479,39 @@ document.addEventListener("change", function(ev){
 document.addEventListener("input", function(ev){
   var t = ev.target;
   if (t.matches('input[data-date]')){ state.dates[t.getAttribute("data-date")] = t.value; save(); }
+});
+
+function keepScroll(fn){ var y = window.scrollY; fn(); window.scrollTo(0,y); }
+document.addEventListener("input", function(ev){
+  var t = ev.target, id = t.getAttribute("data-sid");
+  if (id && t.hasAttribute("data-f")){
+    var i = +t.getAttribute("data-pi"), f = t.getAttribute("data-f"), p = sState(id).prompts[i];
+    if (!p) return;
+    p[f] = t.value; save();
+    if (f === "d" || f === "w"){
+      var wc = document.querySelector('[data-wc="'+id+'-'+i+'"]');
+      if (wc){ wc.textContent = wcHTML(p); wc.className = "wc" + (+p.w && words(p.d) > +p.w ? " over" : ""); }
+    }
+  } else if (id && t.hasAttribute("data-dk")){
+    if (t.value){ sState(id).dates[t.getAttribute("data-dk")] = t.value; save(); renderNext(); }
+  }
+});
+document.addEventListener("change", function(ev){
+  var t = ev.target, id = t.getAttribute("data-sid");
+  if (id && t.getAttribute("data-f") === "s"){ save(); keepScroll(renderSupp); }
+  else if (t.hasAttribute("data-none")){ sState(t.getAttribute("data-none")).none = t.checked; save(); keepScroll(renderSupp); }
+  else if (id && t.hasAttribute("data-dk")){ keepScroll(renderSupp); }
+});
+document.addEventListener("click", function(ev){
+  var b = ev.target.closest && ev.target.closest("[data-act]"); if (!b) return;
+  var id = b.getAttribute("data-sid"), s = sState(id), a = b.getAttribute("data-act");
+  if (a === "addprompt") s.prompts.push({ t:"", w:"", s:"todo", d:"" });
+  else if (a === "delprompt"){ if (!confirm("Remove this prompt and its draft?")) return; s.prompts.splice(+b.getAttribute("data-pi"),1); }
+  else if (a === "bulk"){
+    var ta = document.querySelector('[data-bulk="'+id+'"]');
+    ta.value.split(/\n+/).forEach(function(line){ line = line.trim(); if (line) s.prompts.push({ t:line, w:"", s:"todo", d:"" }); });
+  } else return;
+  save(); keepScroll(renderSupp);
 });
 
 document.querySelectorAll(".tabs button").forEach(function(b){
