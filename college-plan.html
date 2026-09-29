@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Application plan: Fall 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F1F4F9; --surface:#FFFFFF; --ink:#12203A; --muted:#5A6781; --line:#D8DFEA;
+  --accent:#4A3BB0; --accent-soft:#E7E4FA; --site:#0B7F6A; --site-soft:#DDF3EC;
+  --other:#5A6781; --other-soft:#E6EAF1; --warn:#B86A00; --warn-soft:#FFF0D6; --done:#0B7F6A;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1424; --surface:#161F35; --ink:#E8EDF7; --muted:#9BA8C2; --line:#26324D;
+    --accent:#B0A5FF; --accent-soft:#2A2554; --site:#4FD3AE; --site-soft:#12332F;
+    --other:#9BA8C2; --other-soft:#212C45; --warn:#F2B45C; --warn-soft:#3A2C12; --done:#4FD3AE;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1424; --surface:#161F35; --ink:#E8EDF7; --muted:#9BA8C2; --line:#26324D;
+  --accent:#B0A5FF; --accent-soft:#2A2554; --site:#4FD3AE; --site-soft:#12332F;
+  --other:#9BA8C2; --other-soft:#212C45; --warn:#F2B45C; --warn-soft:#3A2C12; --done:#4FD3AE;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+*,*::before,*::after{box-sizing:inherit;}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.45;-webkit-text-size-adjust:100%;}
+.wrap{max-width:640px;margin:0 auto;padding:20px 16px 64px;}
+h1,h2,h3{font-family:"Bricolage Grotesque","Figtree",system-ui,sans-serif;margin:0;letter-spacing:-0.01em;}
+h1{font-size:30px;line-height:1.1;font-weight:700;}
+.sub{color:var(--muted);margin:6px 0 0;font-size:15px;}
+.hero{margin-top:18px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;}
+.count{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+.count .n{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:44px;line-height:1;color:var(--accent);}
+.count .l{font-size:15px;color:var(--muted);}
+.bar{height:8px;border-radius:99px;background:var(--line);margin-top:14px;overflow:hidden;}
+.bar>i{display:block;height:100%;width:0;background:var(--done);border-radius:99px;transition:width .25s ease;}
+.prog{font-size:14px;color:var(--muted);margin-top:8px;}
+.tabs{display:flex;gap:6px;margin:18px 0 12px;background:var(--other-soft);padding:4px;border-radius:12px;}
+.tabs button{flex:1;min-height:44px;border:0;background:transparent;color:var(--muted);font:600 15px "Figtree",sans-serif;border-radius:9px;cursor:pointer;}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12);}
+button:focus-visible,summary:focus-visible,input:focus-visible,label:focus-within{outline:3px solid var(--accent);outline-offset:2px;}
+.legend{display:flex;gap:8px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin:0 0 12px;align-items:center;}
+.tag{font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px;white-space:nowrap;}
+.tag.CA{background:var(--accent-soft);color:var(--accent);}
+.tag.SITE{background:var(--site-soft);color:var(--site);}
+.tag.OTHER{background:var(--other-soft);color:var(--other);}
+details.week{background:var(--surface);border:1px solid var(--line);border-radius:14px;margin-bottom:10px;overflow:hidden;}
+details.week[open]{border-color:var(--accent);}
+summary{list-style:none;cursor:pointer;padding:14px 16px;display:flex;justify-content:space-between;gap:12px;align-items:center;min-height:56px;}
+summary::-webkit-details-marker{display:none;}
+.wk-t{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:18px;line-height:1.2;}
+.wk-d{font-size:13px;color:var(--muted);margin-top:2px;}
+.wk-c{font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap;}
+.wk-c.full{color:var(--done);}
+.now{font-size:12px;font-weight:600;color:var(--accent);margin-left:6px;}
+.tasks{padding:0 8px 8px;}
+.task{display:flex;gap:12px;align-items:flex-start;padding:10px 8px;min-height:48px;border-top:1px solid var(--line);cursor:pointer;}
+.task:first-child{border-top:0;}
+.task input{appearance:none;-webkit-appearance:none;flex:none;width:24px;height:24px;margin:1px 0 0;border:2px solid var(--muted);border-radius:7px;background:transparent;display:grid;place-content:center;cursor:pointer;}
+.task input:checked{background:var(--done);border-color:var(--done);}
+.task input:checked::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-1px,-1px);}
+.task .txt{flex:1;font-size:15.5px;}
+.task input:checked ~ .txt{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line);}
+.task.flag{background:var(--warn-soft);border-radius:10px;border-top-color:transparent;}
+.task.flag .txt{font-weight:600;}
+.task .tag{margin-top:2px;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px;}
+.card h3{font-size:18px;margin-bottom:6px;}
+.card p,.card li{font-size:15px;}
+.card ul,.card ol{margin:8px 0 0;padding-left:20px;}
+.card li{margin-bottom:6px;}
+.note{font-size:13.5px;color:var(--muted);margin:0 0 12px;}
+.school{display:block;}
+.school .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;}
+.school .plan{font-size:13px;color:var(--muted);}
+.steps{display:grid;grid-template-columns:1fr 1fr;gap:0 8px;margin-top:6px;}
+.steps .task{border-top:0;padding:8px 4px;}
+.steps .task .txt{font-size:14.5px;}
+.dl{display:grid;gap:4px;padding:12px 0;border-top:1px solid var(--line);}
+.dl:first-of-type{border-top:0;}
+.dl .row{display:flex;justify-content:space-between;gap:10px;align-items:baseline;}
+.dl b{font-weight:600;}
+.dl .when{font-weight:600;color:var(--ink);text-align:right;}
+.dl .when.typ{color:var(--warn);}
+.dl .pl{font-size:14px;color:var(--muted);}
+.dl input[type="text"]{width:100%;min-height:44px;margin-top:4px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:9px;padding:0 12px;font:15px "Figtree",sans-serif;}
+.reset{margin-top:22px;min-height:44px;padding:0 16px;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:10px;font:600 14px "Figtree",sans-serif;cursor:pointer;}
+[hidden]{display:none !important;}
+@media (prefers-reduced-motion: reduce){.bar>i{transition:none;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Application plan</h1>
+  <p class="sub">Week by week, Fall 2026. Northwestern Early Decision first, everything else after.</p>
+
+  <section class="hero" aria-live="polite">
+    <div class="count"><span class="n" id="days">--</span><span class="l" id="daysLabel">days until Northwestern ED (Mon, Nov 2)</span></div>
+    <div class="bar" role="progressbar" aria-label="Checklist progress" aria-valuemin="0" aria-valuemax="100" id="barWrap"><i id="bar"></i></div>
+    <div class="prog" id="prog"></div>
+  </section>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="weekly">Weekly</button>
+    <button role="tab" aria-selected="false" data-tab="supp">Supplements</button>
+    <button role="tab" aria-selected="false" data-tab="dates">Deadlines</button>
+  </div>
+
+  <div id="weekly"></div>
+  <div id="supp" hidden></div>
+  <div id="dates" hidden></div>
+
+  <button class="reset" id="reset">Clear all checkmarks</button>
+</div>
+
+<script>
+var KEY = "collegeplan.v1";
+var state = { checks: {}, dates: {} };
+try { var saved = JSON.parse(localStorage.getItem(KEY) || "null"); if (saved && saved.checks) state = saved; if (!state.dates) state.dates = {}; } catch (e) {}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+var TAGNAME = { CA: "Common App", SITE: "School site", OTHER: "Other" };
+
+/* [tag, text, isDeadline] */
+var WEEKS = [
+ { s:"2026-09-28", e:"2026-10-04", t:"Set up", tasks:[
+  ["CA","Check that all 12 colleges are in My Colleges (Minnesota included) and pick the plan for each: ED for Northwestern, early or priority for the rest"],
+  ["CA","Finish the Profile, Family, Education, and Testing sections"],
+  ["CA","Fill in Activities: photography club co-founder (about 70 members), Kumon job, art and any other roles. Add hours per week and weeks per year"],
+  ["CA","Add Honors, including the Congressional Art Competition honorable mention"],
+  ["CA","Invite 2 teachers and your counselor as recommenders (Recommenders tab)"],
+  ["CA","Open the Writing Supplement tab for each school and paste every prompt into one doc"],
+  ["SITE","Open each school's admissions site and confirm its real deadline and plan. Save it in the Deadlines tab"],
+  ["SITE","Run the net price calculator on Northwestern's site and talk with a parent about ED being binding"],
+  ["SITE","Make FSA IDs (you and one parent) at studentaid.gov so FAFSA is ready"],
+  ["OTHER","Book your next essay coach session and send the Northwestern prompts"]
+ ]},
+ { s:"2026-10-05", e:"2026-10-11", t:"Georgia Tech + Northwestern research", tasks:[
+  ["CA","Georgia Tech: fill in the application questions and draft any short answers"],
+  ["SITE","Start FAFSA with a parent (it should be open around Oct 1; confirm on studentaid.gov)"],
+  ["SITE","Northwestern: find 3 specific things you want there (a program, a class, a group). Save the links and notes"],
+  ["CA","Draft Northwestern supplement #1 (rough is fine) and send it to your coach"],
+  ["CA","Ask your counselor how transcripts and the school report get sent. Set your FERPA waiver"],
+  ["CA","Decide whether you are sending test scores and to which schools"],
+  ["OTHER","Follow up with any teacher who hasn't accepted the recommender invite"]
+ ]},
+ { s:"2026-10-12", e:"2026-10-18", t:"Georgia Tech deadline", tasks:[
+  ["CA","Proofread the Georgia Tech application and preview the PDF"],
+  ["CA","Submit Georgia Tech by Wed Oct 14, one day before the usual Oct 15 deadline (confirm on their site)",true],
+  ["SITE","Check your email and the Georgia Tech portal for a confirmation and any missing items"],
+  ["CA","Draft Northwestern supplement #2"],
+  ["OTHER","Get coach feedback on Northwestern #1"]
+ ]},
+ { s:"2026-10-19", e:"2026-10-25", t:"Northwestern revisions", tasks:[
+  ["CA","Revise both Northwestern supplements using coach feedback"],
+  ["CA","Check that your recommendations show as received"],
+  ["CA","Ask your counselor to confirm the transcript and school report are submitted"],
+  ["CA","Complete the Early Decision agreement (you, a parent, and your counselor sign)"],
+  ["SITE","Finish the CSS Profile if Northwestern requires it, and FAFSA. Check Northwestern's aid deadline for ED"],
+  ["SITE","Look up the real deadline and extra requirements for Purdue, Minnesota, Virginia Tech, UF, UCF, and USF"]
+ ]},
+ { s:"2026-10-26", e:"2026-11-01", t:"Northwestern: submit", tasks:[
+  ["CA","Read both Northwestern supplements out loud and check the word limits"],
+  ["CA","Preview the full Common App PDF for Northwestern and fix any errors"],
+  ["CA","Submit Northwestern Early Decision by Fri Oct 30. The deadline is Mon Nov 2, so this leaves a buffer",true],
+  ["SITE","Log in to Northwestern's applicant portal and check that nothing is missing"],
+  ["OTHER","Take a night off"]
+ ]},
+ { s:"2026-11-02", e:"2026-11-08", t:"Early and rolling schools", tasks:[
+  ["CA","If Northwestern is not submitted yet, submit it this morning. Deadline is today",true],
+  ["CA","Write any required supplements for Purdue, Minnesota, UF, UCF, and USF"],
+  ["CA","Submit Purdue, Minnesota, UF, UCF, and USF (whichever have early or priority deadlines around now)"],
+  ["SITE","Check each school's portal to confirm the application is complete"],
+  ["SITE","Look up honors college and scholarship applications for UF, UCF, USF, Purdue, Minnesota, and Virginia Tech. Note the deadlines"]
+ ]},
+ { s:"2026-11-09", e:"2026-11-15", t:"Finish early schools", tasks:[
+  ["CA","Submit Virginia Tech (confirm the deadline, it is often around Nov 15)",true],
+  ["CA","Submit any early school you haven't sent yet"],
+  ["CA","Start Tufts: pull the prompts and outline your answers"],
+  ["SITE","Portal check for every early school"],
+  ["SITE","Apply to the scholarships and honors programs you found last week"]
+ ]},
+ { s:"2026-11-16", e:"2026-11-22", t:"Tufts + Carnegie Mellon", tasks:[
+  ["CA","Draft the Tufts supplements"],
+  ["CA","Draft the Carnegie Mellon supplements"],
+  ["SITE","Check CMU's site for any program-specific requirements (portfolio, extra forms)"],
+  ["OTHER","Send both drafts to your coach"]
+ ]},
+ { s:"2026-11-23", e:"2026-11-29", t:"Thanksgiving week (light)", tasks:[
+  ["OTHER","Keep it light. One small task is enough"],
+  ["CA","Revise Tufts using coach feedback"],
+  ["SITE","Portal check for every school you've submitted to"]
+ ]},
+ { s:"2026-11-30", e:"2026-12-06", t:"Bucknell + Lehigh", tasks:[
+  ["CA","Draft the Bucknell supplements"],
+  ["CA","Draft the Lehigh supplements"],
+  ["CA","Revise Carnegie Mellon using coach feedback"],
+  ["SITE","Check both schools' sites for scholarship and honors deadlines"]
+ ]},
+ { s:"2026-12-07", e:"2026-12-13", t:"Polish everything", tasks:[
+  ["CA","Final coach round on Tufts, CMU, Bucknell, and Lehigh"],
+  ["CA","Proofread and preview the PDF for each of those four"],
+  ["SITE","Confirm every early school has your recommendations and transcript"],
+  ["OTHER","Northwestern decisions usually come mid-December. Plan for either result"]
+ ]},
+ { s:"2026-12-14", e:"2026-12-20", t:"Northwestern result", tasks:[
+  ["SITE","Check Northwestern's portal and your email for the ED decision"],
+  ["OTHER","If admitted: withdraw your other applications and follow the enrollment steps in the portal"],
+  ["OTHER","If deferred or denied: follow Northwestern's instructions and go ahead with everything else"],
+  ["CA","Submit Tufts, CMU, Bucknell, and Lehigh before winter break. Don't wait for the deadline"],
+  ["CA","Only consider ED II at any of them if Northwestern releases you from ED. Read their rules first"]
+ ]},
+ { s:"2026-12-21", e:"2027-01-03", t:"Break: last deadlines", tasks:[
+  ["CA","Confirm Tufts and CMU are submitted before Jan 1",true],
+  ["CA","Confirm Bucknell and Lehigh are in (their deadlines are often mid-January)"],
+  ["SITE","Check every portal for missing items"]
+ ]},
+ { s:"2027-01-04", e:"2027-01-17", t:"Mid-year", tasks:[
+  ["OTHER","Ask your counselor to send the mid-year report once first-semester grades post"],
+  ["SITE","Update portals with new awards or grades if the school allows it"],
+  ["SITE","Watch for remaining scholarship and aid deadlines"]
+ ]}
+];
+
+var SCHOOLS = [
+ ["Northwestern University","Early Decision (binding)"],
+ ["Georgia Institute of Technology","Early Action"],
+ ["Purdue University","Early Action"],
+ ["Virginia Tech","Early Action"],
+ ["University of Minnesota Twin Cities","Early Action"],
+ ["University of Florida","Early / priority"],
+ ["University of Central Florida","Early / priority"],
+ ["University of South Florida","Early / priority"],
+ ["Tufts University","Regular Decision"],
+ ["Carnegie Mellon University","Regular Decision"],
+ ["Bucknell University","Regular Decision"],
+ ["Lehigh University","Regular Decision"]
+];
+
+/* [school, plan, deadline text, confirmed?] */
+var DEADLINES = [
+ ["Northwestern University","Early Decision","Nov 2",true],
+ ["Georgia Institute of Technology","Early Action","About Oct 15",false],
+ ["Purdue University","Early Action","About Nov 1",false],
+ ["Virginia Tech","Early Action","About Nov 15",false],
+ ["University of Minnesota Twin Cities","Early Action","About Nov 1",false],
+ ["University of Florida","Early / priority","About Nov 1",false],
+ ["University of Central Florida","Early / priority","About Nov 1",false],
+ ["University of South Florida","Early / priority","About Nov 1",false],
+ ["Tufts University","Regular Decision","Jan 1",true],
+ ["Carnegie Mellon University","Regular Decision","Jan 1",true],
+ ["Bucknell University","Regular Decision","About Jan 15",false],
+ ["Lehigh University","Regular Decision","About Jan 15",false]
+];
+
+var STEPS = [["prompts","Prompts pulled"],["draft","Draft"],["coach","Coach reviewed"],["final","Final"]];
+
+function slug(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""); }
+function d(str){ var p = str.split("-"); return new Date(+p[0], +p[1]-1, +p[2]); }
+function fmt(dt){ return dt.toLocaleDateString(undefined,{month:"short",day:"numeric"}); }
+
+function taskHTML(id, tag, text, flag){
+  var chk = state.checks[id] ? " checked" : "";
+  return '<label class="task'+(flag?' flag':'')+'"><input type="checkbox" data-id="'+id+'"'+chk+'>' +
+         '<span class="txt">'+text+'</span>' +
+         (tag ? '<span class="tag '+tag+'">'+TAGNAME[tag]+'</span>' : '') + '</label>';
+}
+
+function currentWeekIndex(){
+  var now = new Date(); now.setHours(12,0,0,0);
+  for (var i=0;i<WEEKS.length;i++){
+    var s=d(WEEKS[i].s), e=d(WEEKS[i].e); e.setHours(23,59,59,999);
+    if (now>=s && now<=e) return i;
+  }
+  return now < d(WEEKS[0].s) ? 0 : WEEKS.length-1;
+}
+
+function renderWeekly(){
+  var cur = currentWeekIndex();
+  var h = '<div class="legend"><span>Where to do it:</span><span class="tag CA">Common App</span><span class="tag SITE">School site</span><span class="tag OTHER">Other</span></div>';
+  WEEKS.forEach(function(w,i){
+    var inner = w.tasks.map(function(t,j){ return taskHTML("w"+i+"-"+j, t[0], t[1], t[2]); }).join("");
+    h += '<details class="week" data-week="'+i+'"'+(i===cur?' open':'')+'><summary><div><div class="wk-t">'+w.t+(i===cur?'<span class="now">This week</span>':'')+'</div>' +
+         '<div class="wk-d">'+fmt(d(w.s))+' to '+fmt(d(w.e))+'</div></div><div class="wk-c" data-count="'+i+'"></div></summary><div class="tasks">'+inner+'</div></details>';
+  });
+  document.getElementById("weekly").innerHTML = h;
+}
+
+function renderSupp(){
+  var h = '';
+  h += '<div class="card"><h3>How to get through 12 sets of supplements</h3><ol>' +
+    '<li>Group prompts into types: why this school, why this major, a community or activity story, and a creative or short-answer one.</li>' +
+    '<li>Write one strong draft per type. Then tailor it for each school with specifics you can only say about that school.</li>' +
+    '<li>Do Northwestern first, then Georgia Tech, then the rest in deadline order.</li>' +
+    '<li>Send each draft to your coach before you revise it. Aim for two rounds.</li>' +
+    '<li>Read it out loud, check the word limit, and paste it into the Common App last.</li></ol></div>';
+  h += '<div class="card"><h3>Pick stories your personal essay did not use</h3>' +
+    '<p>Your personal statement already covers your Roblox to Blender to 3D printing path, the RC car redesign, the Infusion Center art piece, and the Congressional Art Competition. Supplements read better when they show other sides of you. Ideas to draw from:</p>' +
+    '<ul><li>Starting the photography club and growing it to about 70 members</li><li>Teaching math and reading at Kumon</li><li>Your train and locomotive projects</li><li>Your AP 2-D Art portfolio and how your ideas jump between subjects</li></ul></div>';
+  h += '<p class="note">Prompts change every year. Use the Writing Supplement tab in the Common App for the official ones, and check each school\'s site for anything that is not in the Common App.</p>';
+  SCHOOLS.forEach(function(s){
+    var id = slug(s[0]);
+    var steps = STEPS.map(function(st){ return taskHTML("s-"+id+"-"+st[0], "", st[1], false); }).join("");
+    h += '<div class="card school"><div class="top"><h3>'+s[0]+'</h3></div><div class="plan">'+s[1]+'</div><div class="steps">'+steps+'</div></div>';
+  });
+  document.getElementById("supp").innerHTML = h;
+}
+
+function renderDates(){
+  var h = '<p class="note">Confirmed dates come from the schools\' 2026-27 listings. Dates marked "About" are typical and may differ this year. Type the date you verify on each school\'s site in the box so you have one list to trust.</p><div class="card">';
+  DEADLINES.forEach(function(r){
+    var id = slug(r[0]);
+    var v = (state.dates[id] || "").replace(/"/g,"&quot;");
+    h += '<div class="dl"><div class="row"><b>'+r[0]+'</b><span class="when'+(r[3]?'':' typ')+'">'+r[2]+'</span></div>' +
+         '<div class="pl">'+r[1]+'</div>' +
+         '<input type="text" data-date="'+id+'" value="'+v+'" placeholder="Verified date from school site" aria-label="Verified deadline for '+r[0]+'"></div>';
+  });
+  h += '</div>';
+  document.getElementById("dates").innerHTML = h;
+}
+
+function updateProgress(){
+  var boxes = document.querySelectorAll('input[type="checkbox"][data-id]');
+  var total = boxes.length, done = 0;
+  boxes.forEach(function(b){ if (b.checked) done++; });
+  var pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById("bar").style.width = pct+"%";
+  document.getElementById("barWrap").setAttribute("aria-valuenow", pct);
+  document.getElementById("prog").textContent = done+" of "+total+" tasks done";
+  WEEKS.forEach(function(w,i){
+    var n = w.tasks.length, c = 0;
+    for (var j=0;j<n;j++) if (state.checks["w"+i+"-"+j]) c++;
+    var el = document.querySelector('[data-count="'+i+'"]');
+    if (el){ el.textContent = c+"/"+n; el.className = "wk-c"+(c===n?" full":""); }
+  });
+}
+
+function updateCountdown(){
+  var target = new Date(2026,10,2,23,59,59);
+  var ms = target - new Date();
+  var days = Math.ceil(ms/86400000);
+  var n = document.getElementById("days"), l = document.getElementById("daysLabel");
+  if (ms <= 0){ n.textContent = "0"; l.textContent = "Northwestern ED deadline has passed"; }
+  else if (days === 1){ n.textContent = "1"; l.textContent = "day until Northwestern ED (today or tomorrow, check the clock)"; }
+  else { n.textContent = days; l.textContent = "days until Northwestern ED (Mon, Nov 2)"; }
+}
+
+document.addEventListener("change", function(ev){
+  var t = ev.target;
+  if (t.matches('input[type="checkbox"][data-id]')){
+    if (t.checked) state.checks[t.getAttribute("data-id")] = true; else delete state.checks[t.getAttribute("data-id")];
+    save(); updateProgress();
+  }
+});
+document.addEventListener("input", function(ev){
+  var t = ev.target;
+  if (t.matches('input[data-date]')){ state.dates[t.getAttribute("data-date")] = t.value; save(); }
+});
+
+document.querySelectorAll(".tabs button").forEach(function(b){
+  b.addEventListener("click", function(){
+    document.querySelectorAll(".tabs button").forEach(function(x){ x.setAttribute("aria-selected", x===b ? "true" : "false"); });
+    ["weekly","supp","dates"].forEach(function(id){ document.getElementById(id).hidden = (id !== b.getAttribute("data-tab")); });
+  });
+});
+
+var resetArmed = false, resetTimer = null;
+document.getElementById("reset").addEventListener("click", function(){
+  var btn = this;
+  if (!resetArmed){
+    resetArmed = true; btn.textContent = "Tap again to clear all checkmarks";
+    resetTimer = setTimeout(function(){ resetArmed = false; btn.textContent = "Clear all checkmarks"; }, 3500);
+    return;
+  }
+  clearTimeout(resetTimer); resetArmed = false; btn.textContent = "Clear all checkmarks";
+  state.checks = {}; save();
+  document.querySelectorAll('input[type="checkbox"][data-id]').forEach(function(b){ b.checked = false; });
+  updateProgress();
+});
+
+renderWeekly(); renderSupp(); renderDates(); updateProgress(); updateCountdown();
+</script>
+</body>
+</html>
